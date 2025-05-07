@@ -1,8 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, SafeAreaView } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import { Button, ProgressBar, Card, Divider } from "react-native-paper"
 import { useLanguage } from "../contexts/LanguageContext"
 import { translations } from "../data/translations"
 
@@ -60,6 +71,7 @@ export default function InteroceptiveExercise({ onClose }) {
 
   const addOption = () => {
     setOptions([...options, ""])
+    setBodyResponses([...bodyResponses, ""])
   }
 
   const updateOption = (text, index) => {
@@ -90,6 +102,7 @@ export default function InteroceptiveExercise({ onClose }) {
               placeholder={t.enterYourChallenge}
               value={challenge}
               onChangeText={setChallenge}
+              textAlignVertical="top"
             />
           </View>
         )
@@ -107,10 +120,14 @@ export default function InteroceptiveExercise({ onClose }) {
               />
             ))}
             {options.length < 5 && (
-              <TouchableOpacity style={styles.addButton} onPress={addOption}>
-                <Ionicons name="add-circle-outline" size={20} color="#6366f1" />
-                <Text style={styles.addButtonText}>{t.addOption}</Text>
-              </TouchableOpacity>
+              <Button
+                mode="text"
+                onPress={addOption}
+                icon={() => <Ionicons name="add-circle-outline" size={20} color="#6366f1" />}
+                style={styles.addButton}
+              >
+                {t.addOption}
+              </Button>
             )}
           </View>
         )
@@ -128,6 +145,7 @@ export default function InteroceptiveExercise({ onClose }) {
                   placeholder={t.howBodyResponds}
                   value={bodyResponses[index] || ""}
                   onChangeText={(text) => updateBodyResponse(text, index)}
+                  textAlignVertical="top"
                 />
               </View>
             ))}
@@ -140,78 +158,96 @@ export default function InteroceptiveExercise({ onClose }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t.interoceptiveTitle}</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${((currentStep + 1) / steps.length) * 100}%` }]} />
-        </View>
-        <Text style={styles.progressText}>
-          {currentStep + 1} / {steps.length}
-        </Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.stepContainer}>
-          <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
-          <Text style={styles.stepInstruction}>{steps[currentStep].instruction}</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Ionicons name="close" size={24} color="#000000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t.interoceptiveTitle}</Text>
+          <View style={styles.placeholder} />
         </View>
 
-        {renderInput()}
-
-        {currentStep === steps.length - 1 && (
-          <View style={styles.summaryContainer}>
-            <Text style={styles.summaryTitle}>{t.exerciseSummary}</Text>
-
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>{t.yourChallenge}:</Text>
-              <Text style={styles.summaryText}>{challenge}</Text>
-            </View>
-
-            <Text style={styles.summaryLabel}>{t.yourOptions}:</Text>
-            {options.map((option, index) => (
-              <View key={`summary-option-${index}`} style={styles.summaryItem}>
-                <Text style={styles.summaryText}>
-                  {index + 1}. {option}
-                </Text>
-                <Text style={styles.summarySubtext}>
-                  {t.bodyResponse}: {bodyResponses[index] || t.noResponseRecorded}
-                </Text>
-              </View>
-            ))}
-
-            <Text style={styles.summaryConclusion}>{t.exerciseConclusion}</Text>
-          </View>
-        )}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.navButton, currentStep === 0 && styles.disabledButton]}
-          onPress={prevStep}
-          disabled={currentStep === 0}
-        >
-          <Ionicons name="chevron-back" size={20} color={currentStep === 0 ? "#9ca3af" : "#6366f1"} />
-          <Text style={[styles.navButtonText, currentStep === 0 && styles.disabledButtonText]}>{t.previous}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.navButton, currentStep === steps.length - 1 && styles.disabledButton]}
-          onPress={nextStep}
-          disabled={currentStep === steps.length - 1}
-        >
-          <Text style={[styles.navButtonText, currentStep === steps.length - 1 && styles.disabledButtonText]}>
-            {t.next}
+        <View style={styles.progressContainer}>
+          <ProgressBar progress={(currentStep + 1) / steps.length} color="#6366f1" style={styles.progressBar} />
+          <Text style={styles.progressText}>
+            {currentStep + 1} / {steps.length}
           </Text>
-          <Ionicons name="chevron-forward" size={20} color={currentStep === steps.length - 1 ? "#9ca3af" : "#6366f1"} />
-        </TouchableOpacity>
-      </View>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.stepContainer}>
+            <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
+            <Text style={styles.stepInstruction}>{steps[currentStep].instruction}</Text>
+          </View>
+
+          {renderInput()}
+
+          {currentStep === steps.length - 1 && (
+            <Card style={styles.summaryContainer}>
+              <Card.Content>
+                <Text style={styles.summaryTitle}>{t.exerciseSummary}</Text>
+
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>{t.yourChallenge}:</Text>
+                  <Text style={styles.summaryText}>{challenge}</Text>
+                </View>
+
+                <Divider style={styles.divider} />
+
+                <Text style={styles.summaryLabel}>{t.yourOptions}:</Text>
+                {options.map((option, index) => (
+                  <View key={`summary-option-${index}`} style={styles.summaryItem}>
+                    <Text style={styles.summaryText}>
+                      {index + 1}. {option}
+                    </Text>
+                    <Text style={styles.summarySubtext}>
+                      {t.bodyResponse}: {bodyResponses[index] || t.noResponseRecorded}
+                    </Text>
+                  </View>
+                ))}
+
+                <Divider style={styles.divider} />
+
+                <Text style={styles.summaryConclusion}>{t.exerciseConclusion}</Text>
+              </Card.Content>
+            </Card>
+          )}
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <Button
+            mode="text"
+            onPress={prevStep}
+            disabled={currentStep === 0}
+            style={styles.navButton}
+            contentStyle={styles.navButtonContent}
+            icon={() => <Ionicons name="chevron-back" size={20} color={currentStep === 0 ? "#9ca3af" : "#6366f1"} />}
+          >
+            {t.previous}
+          </Button>
+
+          <Button
+            mode="text"
+            onPress={nextStep}
+            disabled={currentStep === steps.length - 1}
+            style={styles.navButton}
+            contentStyle={[styles.navButtonContent, styles.nextButtonContent]}
+            icon={({ size, color }) => (
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={currentStep === steps.length - 1 ? "#9ca3af" : "#6366f1"}
+              />
+            )}
+          >
+            {t.next}
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
@@ -245,14 +281,8 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: "#e5e7eb",
     borderRadius: 3,
     marginBottom: 8,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#6366f1",
-    borderRadius: 3,
   },
   progressText: {
     fontSize: 12,
@@ -262,6 +292,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingTop: 0,
+    paddingBottom: 100,
   },
   stepContainer: {
     marginBottom: 24,
@@ -294,14 +325,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 8,
-  },
-  addButtonText: {
-    color: "#6366f1",
-    fontSize: 16,
-    marginLeft: 4,
+    alignSelf: "flex-start",
   },
   responseContainer: {
     marginBottom: 16,
@@ -312,9 +336,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   summaryContainer: {
-    backgroundColor: "#f3f4f6",
-    borderRadius: 12,
-    padding: 16,
+    marginTop: 16,
     marginBottom: 24,
   },
   summaryTitle: {
@@ -339,6 +361,9 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     marginLeft: 16,
   },
+  divider: {
+    marginVertical: 12,
+  },
   summaryConclusion: {
     fontSize: 16,
     fontStyle: "italic",
@@ -351,21 +376,19 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#ffffff",
   },
   navButton: {
+    flex: 1,
+  },
+  navButtonContent: {
+    flexDirection: "row-reverse",
+  },
+  nextButtonContent: {
     flexDirection: "row",
-    alignItems: "center",
-    padding: 8,
-  },
-  navButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#6366f1",
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  disabledButtonText: {
-    color: "#9ca3af",
   },
 })

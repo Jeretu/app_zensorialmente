@@ -1,10 +1,23 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Dimensions, Animated } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Dimensions,
+  Animated,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 import ColorPicker from "react-native-wheel-color-picker"
+import { Button } from "react-native-paper"
 import { useEmotions } from "../contexts/EmotionContext"
 import { useLanguage } from "../contexts/LanguageContext"
 import { translations } from "../data/translations"
@@ -92,8 +105,9 @@ export default function MatrizScreen({ navigation }) {
             key={`${x}-${y}`}
             style={[styles.cell, isSelected && styles.selectedCell]}
             onPress={() => handleCellPress(x, y)}
+            activeOpacity={0.7}
           >
-            {isSelected && (
+            {isSelected && emotion && (
               <View style={[styles.emotionBubble, { backgroundColor: emotion.color }]}>
                 <Text style={styles.emotionText}>{emotion.label}</Text>
               </View>
@@ -113,45 +127,52 @@ export default function MatrizScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.matrixContainer}>
-        <View style={styles.axisLabels}>
-          <Text style={styles.axisLabel}>{t.energyAxis}</Text>
-          <View style={styles.yAxisMarkers}>
-            <Text style={styles.axisMarker}>{t.high}</Text>
-            <Text style={styles.axisMarker}>{t.low}</Text>
-          </View>
-        </View>
-
-        <View style={styles.gridContainer}>
-          {renderGrid()}
-
-          <View style={styles.xAxisContainer}>
-            <Text style={styles.axisLabel}>{t.pleasureAxis}</Text>
-            <View style={styles.xAxisMarkers}>
-              <Text style={styles.axisMarker}>{t.low}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.matrixContainer}>
+          <View style={styles.axisLabels}>
+            <Text style={styles.axisLabel}>{t.energyAxis}</Text>
+            <View style={styles.yAxisMarkers}>
               <Text style={styles.axisMarker}>{t.high}</Text>
+              <Text style={styles.axisMarker}>{t.low}</Text>
+            </View>
+          </View>
+
+          <View style={styles.gridContainer}>
+            {renderGrid()}
+
+            <View style={styles.xAxisContainer}>
+              <Text style={styles.axisLabel}>{t.pleasureAxis}</Text>
+              <View style={styles.xAxisMarkers}>
+                <Text style={styles.axisMarker}>{t.low}</Text>
+                <Text style={styles.axisMarker}>{t.high}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <Animated.View style={[styles.selectionInfo, { opacity: fadeAnim }]}>
-        {selectedCell && selectedCell.emotion && (
-          <>
-            <View style={styles.emotionHeader}>
-              <View style={[styles.colorDot, { backgroundColor: selectedCell.emotion.color }]} />
-              <Text style={styles.selectedEmotionText}>{selectedCell.emotion.label}</Text>
-              <TouchableOpacity onPress={handleEditEmotion} style={styles.editButton}>
-                <Ionicons name="pencil" size={18} color="#6366f1" />
-              </TouchableOpacity>
-            </View>
+        <Animated.View style={[styles.selectionInfo, { opacity: fadeAnim }]}>
+          {selectedCell && selectedCell.emotion && (
+            <>
+              <View style={styles.emotionHeader}>
+                <View style={[styles.colorDot, { backgroundColor: selectedCell.emotion.color }]} />
+                <Text style={styles.selectedEmotionText}>{selectedCell.emotion.label}</Text>
+                <TouchableOpacity onPress={handleEditEmotion} style={styles.editButton}>
+                  <Ionicons name="pencil" size={18} color="#6366f1" />
+                </TouchableOpacity>
+              </View>
 
-            <TouchableOpacity style={styles.recordButton} onPress={() => setModalVisible(true)}>
-              <Text style={styles.recordButtonText}>{t.recordEmotion}</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </Animated.View>
+              <Button
+                mode="contained"
+                onPress={() => setModalVisible(true)}
+                style={styles.recordButton}
+                labelStyle={styles.recordButtonText}
+              >
+                {t.recordEmotion}
+              </Button>
+            </>
+          )}
+        </Animated.View>
+      </ScrollView>
 
       {/* Record Emotion Modal */}
       <Modal
@@ -160,7 +181,7 @@ export default function MatrizScreen({ navigation }) {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{t.recordYourEmotion}</Text>
 
@@ -178,19 +199,20 @@ export default function MatrizScreen({ navigation }) {
               placeholder={t.whatInfluencedEmotion}
               value={notes}
               onChangeText={setNotes}
+              textAlignVertical="top"
             />
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelButtonText}>{t.cancel}</Text>
-              </TouchableOpacity>
+              <Button mode="outlined" onPress={() => setModalVisible(false)} style={styles.cancelButton}>
+                {t.cancel}
+              </Button>
 
-              <TouchableOpacity style={styles.saveButton} onPress={handleRecordEmotion}>
-                <Text style={styles.saveButtonText}>{t.save}</Text>
-              </TouchableOpacity>
+              <Button mode="contained" onPress={handleRecordEmotion} style={styles.saveButton} disabled={!notes.trim()}>
+                {t.save}
+              </Button>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Edit Emotion Modal */}
@@ -200,7 +222,7 @@ export default function MatrizScreen({ navigation }) {
         visible={editModalVisible}
         onRequestClose={() => setEditModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{t.editEmotion}</Text>
 
@@ -220,16 +242,21 @@ export default function MatrizScreen({ navigation }) {
             </View>
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
-                <Text style={styles.cancelButtonText}>{t.cancel}</Text>
-              </TouchableOpacity>
+              <Button mode="outlined" onPress={() => setEditModalVisible(false)} style={styles.cancelButton}>
+                {t.cancel}
+              </Button>
 
-              <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
-                <Text style={styles.saveButtonText}>{t.save}</Text>
-              </TouchableOpacity>
+              <Button
+                mode="contained"
+                onPress={handleSaveEdit}
+                style={styles.saveButton}
+                disabled={!emotionLabel.trim()}
+              >
+                {t.save}
+              </Button>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   )
@@ -240,8 +267,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
-  matrixContainer: {
+  scrollContent: {
     padding: 20,
+  },
+  matrixContainer: {
     alignItems: "center",
   },
   axisLabels: {
@@ -335,14 +364,9 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   recordButton: {
-    backgroundColor: "#6366f1",
-    padding: 12,
     borderRadius: 6,
-    alignItems: "center",
   },
   recordButtonText: {
-    color: "#ffffff",
-    fontWeight: "bold",
     fontSize: 16,
   },
   modalContainer: {
@@ -389,7 +413,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     height: 120,
-    textAlignVertical: "top",
   },
   colorPickerContainer: {
     height: 220,
@@ -401,27 +424,11 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
     marginRight: 8,
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    color: "#4b5563",
-    fontWeight: "bold",
+    borderColor: "#d1d5db",
   },
   saveButton: {
     flex: 1,
-    backgroundColor: "#6366f1",
-    padding: 12,
-    borderRadius: 6,
     marginLeft: 8,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#ffffff",
-    fontWeight: "bold",
   },
 })

@@ -67,6 +67,7 @@
     "@react-native-async-storage/async-storage": "latest",
     "expo-status-bar": "latest",
     "@expo/vector-icons": "latest",
+    "react-native-paper": "latest",
     "react-native-wheel-color-picker": "latest"
   },
   "devDependencies": {

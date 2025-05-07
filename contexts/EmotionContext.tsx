@@ -1,9 +1,9 @@
 "use client"
 
-import type React from "react"
 import { createContext, useState, useContext, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { defaultEmotionMatrix } from "../data/defaultEmotions"
+import type { ReactNode } from "react"
 
 type Emotion = {
   x: number
@@ -45,10 +45,13 @@ const EmotionContext = createContext<EmotionContextType>({
   clearEmotionRecords: () => {},
 })
 
-export const EmotionProvider: React.FC<{
-  children: React.ReactNode
+export const EmotionProvider = ({
+  children,
+  initialMatrix,
+}: {
+  children: ReactNode
   initialMatrix: EmotionMatrixData
-}> = ({ children, initialMatrix }) => {
+}) => {
   const [emotionMatrix, setEmotionMatrix] = useState<EmotionMatrixData>(initialMatrix)
   const [emotionRecords, setEmotionRecords] = useState<EmotionRecord[]>([])
 

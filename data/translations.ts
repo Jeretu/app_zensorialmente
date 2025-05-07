@@ -110,7 +110,7 @@ export const translations = {
     clearEmotionRecords: "Borrar registros emocionales",
     clearEmotionRecordsDescription: "Eliminar todos los registros emocionales guardados",
     confirmResetMatrix: "Confirmar restablecimiento",
-    confirmResetMatrixDescription:
+    confirmResetMatrixMessage:
       "¿Estás seguro de que quieres restablecer la matriz emocional a los valores predeterminados?",
     confirmClearRecords: "Confirmar borrado",
     confirmClearRecordsMessage:
@@ -229,7 +229,7 @@ export const translations = {
     clearEmotionRecords: "Clear emotion records",
     clearEmotionRecordsDescription: "Delete all saved emotion records",
     confirmResetMatrix: "Confirm reset",
-    confirmResetMatrixDescription: "Are you sure you want to reset the emotion matrix to default values?",
+    confirmResetMatrixMessage: "Are you sure you want to reset the emotion matrix to default values?",
     confirmClearRecords: "Confirm clearing",
     confirmClearRecordsMessage: "Are you sure you want to clear all emotion records? This action cannot be undone.",
     reset: "Reset",

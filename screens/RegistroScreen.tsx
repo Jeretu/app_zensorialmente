@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 import { format } from "date-fns"
 import { es, enUS } from "date-fns/locale"
+import { Divider } from "react-native-paper"
 import { useEmotions } from "../contexts/EmotionContext"
 import { useLanguage } from "../contexts/LanguageContext"
 import { translations } from "../data/translations"
@@ -114,6 +115,7 @@ export default function RegistroScreen() {
 
           {isExpanded && item.notes && (
             <View style={styles.notesContainer}>
+              <Divider style={styles.divider} />
               <Text style={styles.notesLabel}>{t.notes}:</Text>
               <Text style={styles.notesText}>{item.notes}</Text>
             </View>
@@ -259,11 +261,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
     color: "#9ca3af",
   },
+  divider: {
+    marginVertical: 8,
+  },
   notesContainer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
+    marginTop: 4,
   },
   notesLabel: {
     fontSize: 14,

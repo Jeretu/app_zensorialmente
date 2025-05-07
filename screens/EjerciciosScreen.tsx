@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Modal } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
+import { Card, Title, Paragraph } from "react-native-paper"
 import { useLanguage } from "../contexts/LanguageContext"
 import { translations } from "../data/translations"
 import BodyAwarenessExercise from "../components/BodyAwarenessExercise"
@@ -60,26 +61,28 @@ export default function EjerciciosScreen() {
         <Text style={styles.subtitle}>{t.exercisesDescription}</Text>
 
         {exercises.map((exercise) => (
-          <TouchableOpacity key={exercise.id} style={styles.exerciseCard} onPress={() => startExercise(exercise.id)}>
-            <View style={styles.exerciseIconContainer}>
-              <Text style={styles.exerciseIcon}>{exercise.icon}</Text>
-            </View>
-            <View style={styles.exerciseInfo}>
-              <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-              <Text style={styles.exerciseDescription}>{exercise.description}</Text>
-              <View style={styles.exerciseMetadata}>
-                <View style={styles.metadataItem}>
-                  <Ionicons name="time-outline" size={14} color="#6b7280" />
-                  <Text style={styles.metadataText}>{exercise.duration}</Text>
-                </View>
-                <View style={styles.metadataItem}>
-                  <Ionicons name="calendar-outline" size={14} color="#6b7280" />
-                  <Text style={styles.metadataText}>{exercise.frequency}</Text>
+          <Card key={exercise.id} style={styles.exerciseCard} onPress={() => startExercise(exercise.id)}>
+            <Card.Content style={styles.cardContent}>
+              <View style={styles.exerciseIconContainer}>
+                <Text style={styles.exerciseIcon}>{exercise.icon}</Text>
+              </View>
+              <View style={styles.exerciseInfo}>
+                <Title style={styles.exerciseTitle}>{exercise.title}</Title>
+                <Paragraph style={styles.exerciseDescription}>{exercise.description}</Paragraph>
+                <View style={styles.exerciseMetadata}>
+                  <View style={styles.metadataItem}>
+                    <Ionicons name="time-outline" size={14} color="#6b7280" />
+                    <Text style={styles.metadataText}>{exercise.duration}</Text>
+                  </View>
+                  <View style={styles.metadataItem}>
+                    <Ionicons name="calendar-outline" size={14} color="#6b7280" />
+                    <Text style={styles.metadataText}>{exercise.frequency}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#6b7280" />
-          </TouchableOpacity>
+              <Ionicons name="chevron-forward" size={20} color="#6b7280" />
+            </Card.Content>
+          </Card>
         ))}
       </ScrollView>
 
@@ -115,17 +118,14 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   exerciseCard: {
+    marginBottom: 16,
+    borderRadius: 12,
+    elevation: 2,
+  },
+  cardContent: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   exerciseIconContainer: {
     width: 50,

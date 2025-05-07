@@ -1,8 +1,8 @@
 "use client"
 
-import type React from "react"
 import { createContext, useState, useContext, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import type { ReactNode } from "react"
 
 type LanguageContextType = {
   language: string
@@ -14,7 +14,7 @@ const LanguageContext = createContext<LanguageContextType>({
   setLanguage: () => {},
 })
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState("es")
 
   useEffect(() => {

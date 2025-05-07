@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import { Button, ProgressBar } from "react-native-paper"
 import { useLanguage } from "../contexts/LanguageContext"
 import { translations } from "../data/translations"
 
@@ -98,9 +99,7 @@ export default function BodyAwarenessExercise({ onClose }) {
       </View>
 
       <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${((currentStep + 1) / steps.length) * 100}%` }]} />
-        </View>
+        <ProgressBar progress={(currentStep + 1) / steps.length} color="#6366f1" style={styles.progressBar} />
         <Text style={styles.progressText}>
           {currentStep + 1} / {steps.length}
         </Text>
@@ -116,40 +115,56 @@ export default function BodyAwarenessExercise({ onClose }) {
           <Text style={styles.timerText}>{formatTime(timer)}</Text>
           <View style={styles.timerControls}>
             {!isTimerRunning ? (
-              <TouchableOpacity style={styles.timerButton} onPress={startTimer}>
-                <Ionicons name="play" size={24} color="#ffffff" />
-                <Text style={styles.timerButtonText}>{t.start}</Text>
-              </TouchableOpacity>
+              <Button
+                mode="contained"
+                onPress={startTimer}
+                icon={() => <Ionicons name="play" size={24} color="#ffffff" />}
+                style={styles.timerButton}
+              >
+                {t.start}
+              </Button>
             ) : (
-              <TouchableOpacity style={[styles.timerButton, styles.pauseButton]} onPress={pauseTimer}>
-                <Ionicons name="pause" size={24} color="#ffffff" />
-                <Text style={styles.timerButtonText}>{t.pause}</Text>
-              </TouchableOpacity>
+              <Button
+                mode="contained"
+                onPress={pauseTimer}
+                icon={() => <Ionicons name="pause" size={24} color="#ffffff" />}
+                style={[styles.timerButton, styles.pauseButton]}
+              >
+                {t.pause}
+              </Button>
             )}
           </View>
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.navButton, currentStep === 0 && styles.disabledButton]}
+        <Button
+          mode="text"
           onPress={prevStep}
           disabled={currentStep === 0}
+          style={styles.navButton}
+          contentStyle={styles.navButtonContent}
+          icon={() => <Ionicons name="chevron-back" size={20} color={currentStep === 0 ? "#9ca3af" : "#6366f1"} />}
         >
-          <Ionicons name="chevron-back" size={20} color={currentStep === 0 ? "#9ca3af" : "#6366f1"} />
-          <Text style={[styles.navButtonText, currentStep === 0 && styles.disabledButtonText]}>{t.previous}</Text>
-        </TouchableOpacity>
+          {t.previous}
+        </Button>
 
-        <TouchableOpacity
-          style={[styles.navButton, currentStep === steps.length - 1 && styles.disabledButton]}
+        <Button
+          mode="text"
           onPress={nextStep}
           disabled={currentStep === steps.length - 1}
+          style={styles.navButton}
+          contentStyle={[styles.navButtonContent, styles.nextButtonContent]}
+          icon={({ size, color }) => (
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={currentStep === steps.length - 1 ? "#9ca3af" : "#6366f1"}
+            />
+          )}
         >
-          <Text style={[styles.navButtonText, currentStep === steps.length - 1 && styles.disabledButtonText]}>
-            {t.next}
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color={currentStep === steps.length - 1 ? "#9ca3af" : "#6366f1"} />
-        </TouchableOpacity>
+          {t.next}
+        </Button>
       </View>
     </SafeAreaView>
   )
@@ -184,14 +199,8 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: "#e5e7eb",
     borderRadius: 3,
     marginBottom: 8,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#6366f1",
-    borderRadius: 3,
   },
   progressText: {
     fontSize: 12,
@@ -229,21 +238,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   timerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#6366f1",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
     borderRadius: 8,
   },
   pauseButton: {
     backgroundColor: "#f59e0b",
-  },
-  timerButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
   },
   footer: {
     flexDirection: "row",
@@ -253,19 +251,12 @@ const styles = StyleSheet.create({
     borderTopColor: "#e5e7eb",
   },
   navButton: {
+    flex: 1,
+  },
+  navButtonContent: {
+    flexDirection: "row-reverse",
+  },
+  nextButtonContent: {
     flexDirection: "row",
-    alignItems: "center",
-    padding: 8,
-  },
-  navButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#6366f1",
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  disabledButtonText: {
-    color: "#9ca3af",
   },
 })
